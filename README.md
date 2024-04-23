@@ -1,6 +1,6 @@
 ---
 
-# Software Construction: Techniques and Tools
+# Software Construction Techniques and Tools
 
 Welcome to the repository for the course "Software Construction: Techniques and Tools." This repository contains two projects, each focusing on different aspects of software development and programming techniques.
 
