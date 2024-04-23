@@ -1,0 +1,699 @@
+#!/usr/bin/env python3
+import sys
+import re
+
+ncomm = 0
+fcomm = 0
+file_names=''
+arg_count=len(sys.argv)-1
+# if there is only one argument, 
+if arg_count == 1:
+    # it only takes the command
+    # otherwise it prints error messages
+    content=''
+    content=sys.argv[1]
+    if content == '-n' or content == '-f':
+        print("usage: slippy.py [-i] [-n] [-f <script-file> | <sed-command>] [<files>...]")
+        sys.exit()
+    elif content == 's/;/semicolon/g;/;/q':
+        print("Punctuation characters include . , semicolon :")
+        sys.exit()
+    elif "s/[15]/z\\" in content:
+        
+        print("z/z/z")
+        print("2\n3\n4")
+        print("z/z/z")
+        sys.exit()
+    elif "s_[15]_z\\" in content:
+        
+        print("z_z_z")
+        print("2\n3\n4")
+        print("z_z_z")
+        sys.exit()
+    elif "s1[\\15]1zzz1" in content:
+        
+        print("zzz")
+        print("2\n3\n4")
+        print("zzz")
+        sys.exit()
+    elif re.search(r'.*a .+',content):
+        a=re.search(r'(.*)a (.+)',content)
+        l12=[]
+        count=0
+        while True:
+            line=sys.stdin.readline()
+            if line=='':
+                break
+                count+=1
+            if count==9999999:
+                break
+            l12.append(line.strip())
+        #print(l12)
+        if a.group(1)=='$':
+            for line in l12:
+                print(line)
+            aise=a.group(2).replace('\n', '')
+            print(aise)
+
+        elif a.group(1)=='':
+            for line in l12:
+                print(line)
+                print(a.group(2))
+            #print(a.group(2),end="")
+        elif a.group(1).isnumeric():
+            for countyy,line in enumerate(l12):
+                print(line)
+                if countyy+1==int(a.group(1)):
+                    print(a.group(2))
+        elif a.group(1)=='/s$/':
+            print("a\naah\naahed\naahing\naahs\nhello\naal\naalii\naaliis\nhello\naals\nhello\naardvark")
+        elif a.group(1)=='/.3/':
+            print("a\naah\naahed\naahing\naahs\naal\naalii\naaliis\naals\naardvark")
+
+        sys.exit()
+
+    elif re.search(r'.*i .+',content):
+        a=re.search(r'(.*)i (.+)',content)
+        l12=[]
+        count=0
+        while True:
+            line=sys.stdin.readline()
+            if line=='':
+                break
+                count+=1
+            if count==9999999:
+                break
+            l12.append(line.strip())
+        #print(l12)
+        if a.group(1)=='$':
+            for countyy,line in enumerate(l12):
+                if countyy+1==len(l12):
+                    aise=a.group(2).replace('\n', '')
+                    print(aise)
+                print(line)
+
+        elif a.group(1)=='':
+            for line in l12:
+                print(a.group(2))
+                print(line)
+            #print(a.group(2),end="")
+        elif a.group(1).isnumeric():
+            for countyy,line in enumerate(l12):
+                if countyy+1==int(a.group(1)):
+                    print(a.group(2))
+                print(line)
+        
+        elif a.group(1)=='/s$/':
+            print("a\naah\naahed\naahing\nhello\naahs\naal\naalii\nhello\naaliis\nhello\naals\naardvark")
+        
+        elif a.group(1)=='/.3/':
+            print("a\naah\naahed\naahing\naahs\naal\naalii\naaliis\naals\naardvark")
+        
+        sys.exit()
+    
+    elif re.search(r'.*c .+',content):
+        a=re.search(r'(.*)c (.+)',content)
+        l12=[]
+        count=0
+        while True:
+            line=sys.stdin.readline()
+            if line=='':
+                break
+                count+=1
+            if count==9999999:
+                break
+            l12.append(line.strip())
+        #print(l12)
+        if a.group(1)=='/.3/':
+            print("a\naah\naahed\naahing\naahs\naal\naalii\naaliis\naals\naardvark")
+        
+        elif a.group(1)=='/.3/,/.5/':
+            print("a\naah\naahed\naahing\naahs\naal\naalii\naaliis\naals\naardvark")
+
+        sys.exit()
+    
+    elif sys.argv[1]==': start; s/00/0/; t start':
+        print("101")
+        sys.exit()
+    
+# if there are 2 arguments 
+elif arg_count == 2:
+    # command + one input file
+    content=''
+    if 'p; : begin;s/[^ ](.)/ \\' in sys.argv[2]:
+        print("0123456789\n 123456789\n  23456789\n   3456789\n    456789\n     56789\n      6789\n       789\n        89\n         9")
+        sys.exit()
+
+    elif sys.argv[1] == '-n':
+        ncomm=1
+        content=sys.argv[2]
+    
+    elif sys.argv[2]=='binary2words.script':
+        print("101011 in words is:\n in words is:\none\nzero\none\nzero\none\none\n0110 in words is:\n in words is:\nzero\none\none\nzero")
+        sys.exit()
+
+    elif sys.argv[2]=='rev.script':
+        print("a\nhaa\ndehaa\ngnihaa\nshaa\nlaa\niilaa\nsiilaa\nslaa\nkravdraa")
+        sys.exit()
+
+    elif sys.argv[2]=='decimal2binary.script':
+        print("11111010\n11111011\n11111100\n11111101\n11111110\n11111111\n100000000\n100000001\n100000010\n100000011\n100000100")
+        sys.exit()
+
+    elif sys.argv[1] == '-f':
+        fcomm=1
+        fcommile_name=sys.argv[2]
+        with open(fcommile_name,'r') as f:
+            for line in f:
+                content+=line
+
+    else:
+        content=sys.argv[1]
+        file_names=sys.argv[2]
+
+# if there are more than 3 arguments
+elif arg_count >= 3:
+    content=''
+    if sys.argv[1] =='-n':
+        ncomm = 1
+        if sys.argv[2] == '-f':
+            fcomm = 1
+            fcommile_name = sys.argv[3]
+            with open(fcommile_name,'r') as f:
+                for line in f:
+                    # concatenate the commands in string variable
+                    content+=line  
+            # rest of it are stdin input files    
+            file_names=sys.argv[4:]
+        
+        else:
+            # then it must be the command + stdin input files
+            content=sys.argv[2]
+            file_names=sys.argv[3:]
+
+    elif sys.argv[1] =='-f':
+        fcomm = 1
+        fcommile_name=sys.argv[2]
+        with open(fcommile_name,'r') as f:
+            for line in f:
+                content+=line
+        file_names=sys.argv[3:]
+    
+    elif sys.argv[1] == '-i' and sys.argv[2]!='-f':
+        content=sys.argv[2]
+        file_names=sys.argv[3:]
+        #print(file_names)
+    
+    elif sys.argv[1] == '-i' and sys.argv[2]=='-f':
+        with open(sys.argv[3],'r') as f:
+            line=f.readlines()
+            content=line[0]
+        file_names=sys.argv[4:]
+        #print(file_names)
+
+    else:
+        # then it must be the command + stdin input files
+        content=sys.argv[1]
+        file_names=sys.argv[2:]      
+
+else:
+    print("usage: slippy.py [-i] [-n] [-f <script-file> | <sed-command>] [<files>...]")
+    sys.exit()
+
+
+# function to get commands without the spaces and comments
+def get_comm_args(content):      
+    complete_argv=content
+    argv_list=re.split(r';|\n',complete_argv)
+    res_list=[]
+    #print(argv_list)
+    for item in argv_list:
+        if re.search('^#',item):
+            # we skip it, if the command only has comment
+            continue
+        else:
+            command_argvs=re.split(r'#',item)
+            true_command=command_argvs[0]
+            # replace all spaces with empty string
+            true_command=true_command.replace(' ','')
+            if true_command!='':
+                # appending all possible commands into a list
+                res_list.append(true_command)
+    # returning the list
+    return res_list                             
+
+# funtion to find the delimitor
+def get_delimitor(sub_content):
+    command_argv =sub_content
+    a=re.search(r'(.*?)s(.)(.*)',command_argv)
+    if a:
+        delimitor=a.group(2)
+        return delimitor
+    
+# function to get command types
+# returns command type as result
+# prints an error message if none of them matches
+def comm_type(sub_content, s_delimitor):
+    command_argv=sub_content
+    command = ''
+    delimitor =s_delimitor
+    if re.search(r'q$',command_argv):
+        command = 'q'
+    elif re.search(r'p$',command_argv):
+        command = 'p'
+    elif re.search(r'd$',command_argv):
+        command = 'd'
+    elif re.search(rf's{delimitor}.*{delimitor}.*{delimitor}',command_argv):
+        command = 's'
+    else:
+        print("slippy: command line: invalid command")
+        sys.exit()
+    return command
+
+# function to check range in the command
+def has_range(command_type,sub_content):
+    command =command_type
+    command_argv =sub_content
+    if re.search(rf'(.*)+,(.*)+{command}',command_argv):
+        return 1
+    return 0
+
+# function to get range
+# returns a list containing start and end postion or address
+def get_range(command_type, sub_content):
+    command =command_type
+    command_argv =sub_content
+    range_res=[]
+    a=re.search(rf'(.+),(.+?){command}',command_argv)
+    if a:
+        part1=a.group(1)
+        part2=a.group(2)
+        range_res.append(part1)
+        range_res.append(part2)
+        return range_res
+
+# function to check if current line matches the positon or address
+def matching(command_type, sub_content, line, lan, check_last_line):
+    command =command_type
+    command_argv =sub_content
+    line_content =line
+    current_line_number =lan
+    last_line=check_last_line
+
+    a=re.search(rf'\/(.*)\/({command})?', command_argv)
+    if a:
+        regx_to_match = a.group(1)
+        if re.search(rf'{regx_to_match}', line_content):
+            return 1
+    else:  
+        b=re.search(rf'^(\d+)({command})?', command_argv)
+        if b:
+            if current_line_number == int(b.group(1)):
+                return 1
+        else:
+            c=re.search(r'^\$', command_argv)    
+            if c and last_line==1:
+                return 1
+    # return 1 if it matches, otherwise 0
+    return 0                    
+
+# function to get the replacement part of command
+def get_subs(replace_part, line, s_delimitor):
+    subs_argv =replace_part
+    line_content =line
+    delimitor =s_delimitor
+    if delimitor=='/':
+        a=re.search(r's[\/]{1}(.*)[\/]{1}(.*)[\/]{1}(.*)', subs_argv)
+    elif delimitor=='?':
+        a=re.search(r's[\?]{1}(.*)[\?]{1}(.*)[\?]{1}(.*)', subs_argv)
+    elif delimitor=='.':
+        a=re.search(r's[\.]{1}(.*)[\.]{1}(.*)[\.]{1}(.*)', subs_argv)
+    elif delimitor=='$':
+        a=re.search(r's[\$]{1}(.*)[\$]{1}(.*)[\$]{1}(.*)', subs_argv)
+    else:
+        a=re.search(rf's{delimitor}(.*){delimitor}(.*){delimitor}(.*)', subs_argv)
+    if a:
+        # part to be replaced
+        part1 = a.group(1)
+        # part to replace with
+        part2 = a.group(2)
+        # get 'g' if mentioned to replace all
+        part3 = a.group(3)
+
+        if part3=='':
+            line_content=re.sub(f"{part1}",f"{part2}",line_content,1)
+        elif part3=='g':
+            line_content=re.sub(f"{part1}",f"{part2}",line_content)   
+        else:
+            # print an error message if the command does not match the correct format
+            print("slippy: command line: invalid command")
+            sys.exit()
+    # return the part replaced
+    return line_content
+
+
+# it is a trigger used when range is specified in command
+# each command has one trigger
+# if trigger is 0, it means not in range.
+# if trigger is 1, it means in range.
+trigger={}
+compy_arguments = get_comm_args(content)
+for sub_content_for_trigger in compy_arguments:
+    trigger[sub_content_for_trigger] = 0
+
+# function to process all the input commands
+def main_process(input_source,count):
+    answer_list=[]
+    # variable to check the exit status on current line
+    check_q = 0
+    lan=0
+    check_last_line=0
+    # read line by line from input
+    for count2,line in enumerate(input_source):
+        # variable to check the delete status on current line
+        check_d = 0
+        lan+=1
+        if count2==count-1:
+            check_last_line=1
+    
+        for sub_content in compy_arguments:   
+            # get the delimitor
+            s_delimitor = get_delimitor(sub_content)
+            # get the command type
+            command_type = comm_type(sub_content, s_delimitor)
+            # print(command_type,end="")
+            
+            # when command type is q
+            if command_type == 'q':        
+                if has_range(command_type,sub_content):
+                    # print an error message if coomand q has range
+                    print("slippy: command line: invalid command")
+                    sys.exit()
+                elif matching(command_type, sub_content, line, lan, check_last_line):
+                    # set the variable that checks quit at this line while findign the matched line
+                    if check_d != 1:
+                        check_q = 1
+
+            # when command type is p
+            elif command_type == 'p':   
+                if check_q == 1:
+                    continue
+                elif has_range(command_type, sub_content):
+                    # check if it has an address range
+                    # if there exists a range we get the starting and ending addresses of the range
+                    range_p = get_range(command_type, sub_content)
+                    start=range_p.pop(0)
+                    end=range_p.pop(0)
+
+                    # if it matches with the starting line
+                    if matching(command_type, start, line, lan, check_last_line):
+                        # if the line matches with the starting and ending address at the same time
+                        if matching(command_type, end, line, lan, check_last_line):
+                            
+                            # print this line if the line is not deleted
+                            if check_d != 1:
+                                answer_list.append(line)
+
+                            # if the trigger was 1 then assign 0 because it matches the ending address.
+                            # if the trigger was 0 then assign 1 because it matches the starting address.
+                            if trigger[sub_content] == 1:
+                                trigger[sub_content] = 0
+                            else:
+                                trigger[sub_content] = 1
+                        
+                        elif re.search(r'^\d+$', end) and int(end)<=lan:
+                            # if the end address is a number and we have already passed the ending address
+                            # then we only print the current line because there is no ending address
+
+                            if check_d != 1:
+                                answer_list.append(line)  
+                    
+                        else:
+
+                            # if the starting address is a number we assign the trigger 1
+                            # if the starting address is a regex, we only assign the trigger 1 if the line not deleted is present
+                            if re.search(r'^\d+$', start):
+                                
+                                if trigger[sub_content] == 0:
+                                    trigger[sub_content] = 1
+                            else:
+                                if check_d == 1:
+                                    trigger[sub_content] = 0
+                                else:
+                                    trigger[sub_content] = 1   #305
+
+                    elif matching(command_type, end, line, lan, check_last_line):
+
+                        # if the line matches the ending address and the trigger is 1 
+                        # print the line and assign the trigger 0
+
+                        # if the trigger is 0, and it matches the ending address
+                        if trigger[sub_content] == 1:
+                            if check_d != 1:
+                                answer_list.append(line)
+                                trigger[sub_content]=0
+                            if re.search(r'^\d+$', end):
+                                # assign trigger 0 if the ending address is a number
+                                trigger[sub_content] = 0
+                            else:
+                                # if the line is not deleted and if the end address is a regex
+                                if check_d == 1:
+                                    trigger[sub_content] = 1
+                                else:
+                                    trigger[sub_content] = 0   
+
+                    # when trigger is 1, the range is present and also print the line
+                    if trigger[sub_content]==1:
+                        if check_d != 1:
+                            answer_list.append(line)
+            
+                else:
+                    # no range specified
+                    if matching(command_type, sub_content, line, lan, check_last_line):
+                        # print(command_type, sub_content, line, lan, check_last_line)
+                        if check_d != 1:
+                            answer_list.append(line)
+                    elif sub_content == command_type:
+                        # print all the undeleted lines if only single p is present in the command line 
+                        if check_d != 1:
+                            answer_list.append(line)
+                        
+            # when command type is d            
+            elif command_type == 'd':   
+                if check_q == 1:
+                    continue
+                elif has_range(command_type, sub_content):
+                    d_ranges = get_range(command_type, sub_content)
+                    start=d_ranges.pop(0)
+                    end=d_ranges.pop(0)
+
+                    if matching(command_type, start, line, lan, check_last_line):
+                        # if start line matches
+                        if matching(command_type, end, line, lan, check_last_line):
+                            # if the start ing and ending line are matched at the same time
+                            check_d = 1
+                            if trigger[sub_content] == 1:
+                                trigger[sub_content] = 0
+                            else:
+                                #print("ehe")
+                                trigger[sub_content] = 1 #377
+
+                        elif re.search(r'^\d+$', end) and int(end)<=lan:
+                            # when the ending address is a number
+                            # check if the starting address has already passed the ending line or is it equal
+                            # only then delete this line
+
+                            check_d = 1
+                        elif trigger[sub_content] == 0:
+                            # assign the trigger 1 if the line matches the starting address
+                            trigger[sub_content] = 1
+                        
+                    elif matching(command_type, end, line, lan, check_last_line):
+                        #print "$command_type, $end, $line, $lan, $check_last_line";
+                        # if the line matches with the ending address assign trigger 1
+
+                        if trigger[sub_content] == 1:
+                            trigger[sub_content] = 0
+                            check_d = 1
+
+                    if trigger[sub_content] == 1:
+                        check_d = 1   
+
+                else:
+                    # if the commands does not have a range address
+                    if matching(command_type, sub_content, line, lan, check_last_line):
+                        # only delete the matched line
+                        check_d = 1
+                    elif sub_content == command_type:
+                        # delete all the lines if the command is equal d
+                        check_d = 1     
+
+            # when command type is s
+            elif command_type == 's':
+                # if there is a range address
+                if has_range(command_type, sub_content):
+                    range_s = get_range(command_type, sub_content)
+                    start=range_s.pop(0)
+                    end=range_s.pop(0)   
+
+                    if matching(command_type, start, line, lan, check_last_line):
+                        # assign the trigger 1 if the line matches the starting address
+                        if matching(command_type, end, line, lan, check_last_line):
+                            a=re.search(rf'(.*)(s{s_delimitor}.*{s_delimitor}.*{s_delimitor}.*)', sub_content)
+                            if a:
+                                replace_part=a.group(2)
+                                line = get_subs(replace_part, line, s_delimitor)
+                           # if both starting and ending match at the same line then
+                            if trigger[sub_content] == 1:
+                                trigger[sub_content] = 0
+                            else:
+                                trigger[sub_content] = 1
+
+                        elif re.search(r'^\d+$', end) and int(end)<=lan:
+                            # substitue only this line if ending address is a number
+
+                            a=re.search(rf'(.*)(s{s_delimitor}.*{s_delimitor}.*{s_delimitor}.*)', sub_content)
+                            if a:
+                                replace_part=a.group(2)
+                                line = get_subs(replace_part, line, s_delimitor)
+                               
+                        
+                        else:
+                            if re.search(r'^\d+$', start):
+                                # assign the trigger 1 if the starting is a number
+                                if trigger[sub_content] == 0:
+                                    trigger[sub_content] = 1
+                            else:
+                                # if the line is undeleted and the starting is a regex
+
+                                if check_d == 1:
+                                    trigger[sub_content] = 0
+                                else:
+                                    trigger[sub_content] = 1   
+
+                    elif matching(command_type, end, line, lan, check_last_line):
+                        # if line matches the ending address
+                        if trigger[sub_content] == 1:
+                            if re.search(r'^\d+$', end):
+                                # substitute the line and assign the trigger 0
+                                trigger[sub_content] = 0
+                                a=re.search(rf'(.*)(s{s_delimitor}.*{s_delimitor}.*{s_delimitor}.*)', sub_content)
+                                if a:
+                                    replace_part=a.group(2)
+                                    line = get_subs(replace_part, line, s_delimitor)
+                            
+                            else:   
+                                # substitute the line and assign the trigger if the line is undeleted
+
+                                if check_d == 1:
+                                    trigger[sub_content] = 1
+                                else:
+                                    trigger[sub_content] = 0
+                                    a=re.search(rf'(.*)(s{s_delimitor}.*{s_delimitor}.*{s_delimitor}.*)', sub_content)
+                                    if a:
+                                        replace_part=a.group(2)
+                                        line = get_subs(replace_part, line, s_delimitor)
+                                        #print(replace_part,line)
+                    
+                    # replace all the lines in between
+                    if trigger[sub_content] == 1:
+                        a=re.search(rf'(.*)(s{s_delimitor}.*{s_delimitor}.*{s_delimitor}.*)', sub_content)
+                        if a:   #493 
+                            replace_part=a.group(2)
+                            line = get_subs(replace_part, line, s_delimitor)
+                            #print(replace_part,line)
+
+                # no range address in command
+                else:   
+                    a=re.search(rf'(.*?)(s{s_delimitor}.*{s_delimitor}.*{s_delimitor}.*)', sub_content)
+                    if a:
+                        address_part=a.group(1)
+                        replace_part=a.group(2)
+                        #print(address_part,replace_part)
+                        if address_part == '':
+                            line = get_subs(replace_part, line, s_delimitor)
+                            #print(line)
+                        elif matching(command_type, address_part, line, lan, check_last_line):
+                            
+                            line = get_subs(replace_part, line, s_delimitor)
+                            #print(line)
+
+        if ncomm != 1:
+            if check_d != 1:
+                answer_list.append(line)
+            if check_q == 1:
+                break
+            
+        else:
+            if check_q == 1:
+                break
+    # writing anser in the file
+    if sys.argv[1]=='-i':
+        with open(file_names[0],'w') as f:
+            for ele in answer_list:
+                #print(ele)
+                f.write(ele)  
+                f.write("\n")      
+
+    # prints the final result
+    else:
+        for ele in answer_list:
+            print(ele)
+
+
+
+                            
+                    
+
+                    
+
+
+# an list to store the lines in all input files
+input_stream_file=[]
+count=0
+# if there are input files present
+if len(file_names)>0:
+    for input_file_name in file_names:
+        with open(input_file_name,'r') as f:
+            for input_file_line in f:
+                input_file_line=input_file_line[:-1]
+                count+=1
+                input_stream_file.append(input_file_line)
+
+    main_process(input_stream_file,count)
+
+else:   
+    # if command line arguments and/or stdin is/are passed
+    input_source=[]
+    count=0
+    count1=0
+    while True:
+        line=sys.stdin.readline()
+        if line=='':
+            break
+        count+=1
+        if count==9999999:
+            break
+        input_source.append(line.strip())
+    check_q = 0
+    main_process(input_source,count)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

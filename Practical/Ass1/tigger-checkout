@@ -1,0 +1,56 @@
+#!/bin/dash
+
+# Check if directory exist or not
+# if not exist raise error
+if test -d .tigger/ 
+then
+	present_branch=$(cat .tigger/current_branch)
+	new_branch=$1
+
+	if test -d ".tigger/branch/$new_branch"
+	then
+		echo "$new_branch" > ".tigger/current_branch"
+		echo "Switched to branch '$new_branch'"
+
+		# Switch branches 
+		for file in *
+		do
+
+			# Copy and override any staged changes
+			if test -f ".tigger/branch/$present_branch/repository/$file"
+			then
+				cp -r ".tigger/branch/$present_branch/repository/$file" ".tigger/branch/$new_branch/repository/"
+			else
+				rm -rf ".tigger/branch/$new_branch/repository/$file"
+			fi
+
+			if test -f ".tigger/branch/$present_branch/latest/$file"
+			then
+				if cmp -s "$file" ".tigger/$present_branch/latest/$file"
+				then
+					rm -rf $file
+				fi
+			fi
+		done
+
+		# copy files from new branch index over
+		for file in .tigger/branch/$new_branch/index/*
+		do
+			if test ! -f "$file" -o test -f $(basename $file)
+			then
+				continue
+			fi
+
+			cp -r $file .
+		done
+
+	else
+		echo "tigger-checkout: error: unknown branch '$new_branch'"
+		exit 1
+	fi
+
+else
+	echo "tigger-checkout: error: no .tigger directory containing tigger repository exists"
+	exit 1
+fi
+

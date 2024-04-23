@@ -1,0 +1,24 @@
+#!/bin/dash
+
+# Check if directory exist or not
+# if not exist raise error
+if test -d .tigger/
+then
+     
+    present_branch=$(cat .tigger/current_branch)
+    
+    # check if the current log file exist or not
+    if test ! -e  .tigger/branch/"$present_branch"/log
+    then
+        # print error
+        echo "tigger-log: error: your repository does not have any commits yet"
+        exit 1
+    else
+        # sequention print from latest to the earlier commit
+        tac .tigger/branch/"$present_branch"/log
+    fi
+
+else
+    echo "tigger-log: error: no .tigger directory containing tigger repository exists"
+    exit 1
+fi

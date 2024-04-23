@@ -1,0 +1,64 @@
+#!/bin/dash
+
+# Check if directory exist or not
+# if not exist raise error
+if [ -d .tigger/ ]
+then
+    format_check=$(echo "$1" | grep -E '^[0-9]*:.*$')
+    if test "$format_check" = "" 
+    then
+        echo "tigger-show: error: invalid object $1"
+        exit 1
+    
+    else
+        # get the name of the file after ':'
+        name=$(echo "$1" | sed -E 's/^[0-9]*://g')
+        # get the number before ':'
+        numb=$(echo "$1" | sed -E 's/:[a-zA-Z0-9].*$//g')
+
+        present_branch=$(cat .tigger/current_branch)
+        
+        check_numb=$(ls -c .tigger/repository|wc -l|sed 's/ //g')
+        
+        if test "$numb" = ""
+        then
+            file=$(ls .tigger/branch/"$present_branch"/index/"$name" 2>/dev/null)
+
+            #Check if file is empty or not
+            if test "$file" != ""
+            then
+                cat ".tigger/branch/$present_branch/index/$name"
+            else
+                echo "tigger-show: error: '$name' not found in index"
+            fi
+            
+        else
+            repo_numb=$(($check_numb - 1))
+            # comparing numb with repo_numb
+            if test "$numb" -gt "$repo_numb"
+            then
+                # the number isiver maximum
+                echo "tigger-show: error: unknown commit '$numb'"
+                exit 1
+
+            else
+                # getting the files in directory and raising exceptions
+                file2=$(ls .tigger/repository/"$numb"/"$name" 2>/dev/null)
+
+                if test "$file2" != ""
+                then
+                    cat ".tigger/repository/$numb/$name"
+                else
+                    echo "tigger-show: error: '$name' not found in commit $numb"
+                fi                
+            fi
+        fi
+    fi
+
+else
+
+    echo "tigger-show: error: no .tigger directory containing tigger repository exists"
+    exit 1
+fi
+
+

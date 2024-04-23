@@ -1,0 +1,54 @@
+#!/bin/dash
+
+# Check if directory exist or not
+# if not exist raise error
+if test -d .tigger/
+then
+
+    # Check if filename is valid or not
+    for file in "$@"
+    do
+        check=$(echo "$file" | grep -E "^[A-Z0-9a-z][A-Z0-9a-z\-\.\_]*$")
+        if test "$check" = ""
+        then
+            # raise error
+            echo "tigger-add: error: invalid filename $file" >/dev/stderr
+            exit 1
+        fi
+    done
+
+    present_branch=$(cat .tigger/current_branch)
+
+    # Check if the file is located in the directory or not
+    for file in "$@"
+    do
+        index1=$(ls "$file" 2>/dev/null) 
+        folder=$(ls .tigger/branch/"$present_branch"/index/$file 2>/dev/null)
+        if test "$folder" = ""
+        then 
+            if test "$index1" = ""
+            then
+                # raise error
+                echo "tigger-add: error: can not open '$file'" > /dev/stderr
+                exit 1
+            fi
+        fi
+    done
+
+    # Copy the file to the branch
+    for file in "$@"
+    do
+        index2=$(ls "$file" 2>/dev/null)
+        if test "$index2" != ""
+        then
+            cp -r "$file" .tigger/branch/"$present_branch"/index/
+        else
+            rm -r ".tigger/branch/$present_branch/index/$file"
+        fi
+    done
+
+else
+    # raise error
+    echo "tigger-add: error: tigger repository directory .tigger not found" >/dev/stderr
+    exit 1
+fi

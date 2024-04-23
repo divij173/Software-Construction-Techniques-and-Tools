@@ -1,0 +1,195 @@
+#!/bin/dash
+
+# Check if directory exist or not
+# if not exist raise error
+if test ! -d .tigger/
+then
+    echo "tigger-branch: error: no .tigger directory containing tigger repository exists" >/dev/stderr
+    exit 1
+
+else
+	# check commit
+	present_branch=$(cat .tigger/current_branch)
+
+	dir_log=".tigger/branch/$present_branch/log"
+	
+	# check if the log is exist or not
+	if test ! -e "$dir_log"
+	then
+		# if there is no commit, the tigger-commit will not create log file
+		echo "tigger-branch: error: this command can not be run until after the first commit" >/dev/stderr
+		exit 1
+	else
+
+		# tigger-branch -d [branch_name]
+		# In the tigger-branch part
+		# there are 3 situations
+		# The first one is show all branches
+		# The seconde one is delete a branch
+		# The third one creating a new branch
+
+		if test "$#" -eq 0
+		then
+			fbranch1=".tigger/branch/*"
+			for file1 in $fbranch1
+			do  
+				branch_name=$(echo "$file1" | cut -d'/' -f3,3)
+				echo "$branch_name"
+			done
+
+		else
+			# check the branch option -d and branch name
+			if test "$1" != "-d"
+			then
+				# check for the valid branch name
+        		# the branch name is like b2 which has both characters and numbers
+				match_branch1=$(echo "$1" | grep -E '^[a-zA-Z0-9][a-zA-Z0-9\.\-\_]+*$')
+				match_numb_branch=$(echo "$1" | grep -E '^[0-9]*$')
+				# check the validation of the branch name
+				if test "$match_branch1" != ""
+				then
+					# eliminating the pure number of branch name
+					if test "$match_numb_branch" != ""
+					then
+						match1=$(echo "$1" | grep -E '^[-].+*$')
+						if test "$match1" != ""
+						then
+							echo "usage: tigger-branch [-d] <branch>" >/dev/stderr
+							exit 1
+							
+						else   
+							echo "tigger-branch: error: invalid branch name '$1'" >/dev/stderr
+							exit 1
+						fi
+
+					else
+						# check if the branch already exists
+						if test -d ".tigger/branch/$1"
+						then
+							# check the existance of the branch
+							echo "tigger-branch: error: branch '$1' already exists" >/dev/stderr
+							exit 1
+
+						else
+							# create a new branch and reletive folders
+                			# The following part of code is similar to the tigger-add / tigger-init
+							mkdir .tigger/branch/"$1"
+							mkdir .tigger/branch/"$1"/repository
+							log_branch=".tigger/branch/$present_branch/log"
+							name_branch=".tigger/branch/$1/"
+
+							cp -r $log_branch $name_branch
+
+							# copy file to current branch
+							index_branch=".tigger/branch/$present_branch/index"
+							name_index_branch=".tigger/branch/$1/index"
+
+							cp -r $index_branch $name_index_branch
+
+							lmodified_branch=$(ls .tigger/branch/$present_branch/repository|sort|tail -n 1)
+							repo_branch=".tigger/branch/$present_branch/repository/$lmodified_branch"
+							repo_name_branch=".tigger/branch/$1/repository/$lmodified_branch"
+
+							cp -r $repo_branch $repo_name_branch
+
+						fi	
+					fi
+				fi
+
+
+			else
+				 # the branch name is like b2 which has both characters and numbers
+				match_branch2=$(echo "$2" | grep -E '^[a-zA-Z0-9][a-zA-Z0-9\.\-\_]+*$')
+				match_branch3=$(echo "$2" | grep -E '^[0-9]*$')
+
+				if test "$match_branch2" != "" 
+				then
+					if test "$match_branch3" != ""
+					then
+						echo "tigger-branch: error: invalid branch name '$2'" >/dev/stderr
+						exit 1
+
+					else
+						if test "$2" = "master"
+						then
+							# if it is master branch, print error
+							echo "tigger-branch: error: can not delete branch 'master'" >/dev/stderr
+							exit 1
+
+						else
+							# check exists
+							if test -d ".tigger/branch/$2"
+							then
+							# This is because the current is occupied the branch
+                			# Therefore, connot delete the current branch
+								# check whether it is located in current branch
+								if test "$2" = "$present_branch"
+								then
+									 # targeting branch is current branch
+									echo "tigger-branch: error: internal error error: Cannot delete branch '$2' checked out" >/dev/stderr
+									exit 1
+								else
+									# check the status of input branch which is selected
+									temp1=0
+									lmodified_repo2=$(ls .tigger/branch/"$2"/repository | sort | tail -n -1)
+									# checking the directory in the branch
+									for file3 in .tigger/branch/*
+									do  
+										# compare with the target branch
+										if test "$file3" != ".tigger/branch/$2"
+										then
+											# check the branch's repository
+											repo_dir="$file3/repository/*"
+											for repository in $repo_dir
+											do  
+												# getting the number
+												numb_repo=$(echo "$repository" | cut -d'/' -f5,5)
+												if test "$numb_repo" -eq "$lmodified_repo2"
+												then
+													 # if the number is same
+                                					# It means the current branch's repository has been modified
+													temp1=1
+												fi
+											done
+										fi
+									done
+
+									if test $temp1 -eq 1
+									then
+										input_branch=".tigger/branch/$2"
+
+										rm -rf "$input_branch"
+										echo "Deleted branch '$2'"
+										
+									else
+										echo "tigger-branch: error: branch '$2' has unmerged changes" >/dev/stderr
+										exit 1
+										
+									fi
+
+
+								fi
+
+							else
+								echo "tigger-branch: error: branch '$2' doesn't exist" >/dev/stderr
+								exit 1
+					
+							fi
+
+
+						fi	
+					fi
+				fi
+				
+			fi
+
+
+
+		fi	
+
+
+	fi
+
+
+fi
+

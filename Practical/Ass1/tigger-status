@@ -1,0 +1,110 @@
+#!/bin/dash
+
+# Check if directory exist or not
+# if not exist raise error
+if test -d .tigger/
+then
+    # Check .tigger/log exists
+    present_branch=$(cat .tigger/current_branch)
+    log_directory=".tigger/branch/$present_branch/log"
+    
+    if test ! -e "$log_directory"
+    then 
+        # if there is no commit, the tigger-commit will not create log file
+        echo "tigger-status: error: your repository does not have any commits yet"
+        exit 1
+    
+    else
+        index1=".tigger/branch/$present_branch/index"
+        lmodified_branch1=$(ls .tigger/branch/"$present_branch"/repository | sort | tail -n -1)
+        present_repo=".tigger/branch/$present_branch/repository/$lmodified_branch1"
+
+        # go through each file in the previous sorted_file_name
+        ls * "$index1"/* "$present_repo"/* 2>/dev/null|sed -E 's/^\....*\///g' | sort | uniq | while read file
+        do
+            f_index="$index1/$file"
+            f_repo="$present_repo/$file"
+
+
+            # checking whether the file is in the index folder, 
+            # if the file is not in the idnex folder it is untracked file
+            if test -e "$f_index"
+            then
+                if test ! -e "$f_repo"
+                then
+                    if  test ! -e "$file"
+                    then
+                        echo "$file - added to index, file deleted"
+                    else
+                        index_diff3=$(diff "$file" "$f_index" | wc -w)
+                        if test "$index_diff3" -eq 0
+                        then
+                            # current_index_difference = 0 ----> no changes
+                            echo "$file - added to index"
+                        else
+                            # current_index_difference != 0 ----> get changes
+                            echo "$file - added to index, file changed" 
+                        fi  
+                    fi
+
+                else
+                    if test ! -e "$file"
+                    then
+                        #checking the difference
+                        repo_diff1=$(diff "$f_repo" "$f_index"|wc -w)
+                        if test "$repo_diff1" -gt 0
+                        then
+                            # repository_difference > 0 staged for commit
+                            echo "$file - file deleted, defferent changes staged for commit"
+                            
+                        else
+                            # repository_difference <= 0 file deleted
+                            echo "$file - file deleted"
+                        fi
+
+                    else
+                        index_diff=$(diff "$f_repo" "$f_index" | wc -w)
+                        present_file_diff=$(diff "$f_index" "$file" | wc -w)
+
+                        if test "$present_file_diff" -eq 0
+                        then
+                            if test "$index_diff" -gt 0
+                            then
+                                echo "$file - file changed, changes staged for commit"
+                            elif test "$index_diff" -eq 0
+                            then
+                                echo "$file - same as repo"
+                            fi
+                        fi
+
+                        if test "$present_file_diff" -gt 0
+                        then
+                            if test "$index_diff" -gt 0
+                            then
+                                echo "$file - file changed, different changes staged for commit"
+                            elif test "$index_diff" -eq 0
+                            then
+                                echo "$file - file changed, changes not staged for commit"
+                            fi
+                        fi 
+                    fi
+                fi
+
+            else
+                if test -e "$file"
+                then
+                    # If this file is existed set as ----> untracked
+                    echo "$file - untracked"
+                else
+                    # If this file is not existed set as ----> deleted
+                    echo "$file - deleted"
+                fi
+            fi
+        done
+    fi
+
+else
+    echo "tigger-status: error: no .tigger directory containing tigger repository exists"
+    exit 1
+fi
+

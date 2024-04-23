@@ -1,0 +1,220 @@
+#!/bin/dash
+
+# Check if directory exist or not
+# if not exist raise error
+if test -d .tigger/
+then
+    # Two counters first is force and second one is cached
+    temp1_force=0
+    temp2_cached_cached=0
+
+    present_branch=$(cat .tigger/current_branch)
+
+    if test "$1" = "--force"
+    then
+        temp1_force=1
+        #used for moving to next one
+        shift
+
+        if test "$1" = "--cached"
+        then
+            temp2_cached_cached=1
+            shift
+        fi
+    fi
+
+    if test "$1" = "--cached"
+    then
+        temp2_cached_cached=1
+        shift
+    fi
+
+    # check if all files are in index or not
+    for file in "$@"
+    do
+        if test ! -e ".tigger/branch/$present_branch/index/$file"
+        then
+            echo "tigger-rm: error: '$file' is not in the tigger repository"
+            exit 1
+        fi
+    done
+
+    # check the flag of force and catched
+    if test "$temp1_force" -eq 1
+    then
+        for file1 in "$@"
+        do
+            rm -r ".tigger/branch/$present_branch/index/$file1"
+        done
+
+        if test "$temp2_cached_cached" -eq 0
+        then
+            for file2 in "$@"
+            do
+                if test -e "$file2"
+                then 
+                    rm -r "$file2" 
+                fi
+            done
+        fi
+        exit 0
+    fi
+
+    change_temp3=0
+    # check whether the contents are different or not
+    numb=$(ls -c .tigger/repository | wc -l | sed -E 's/ //g')
+    latest_branch=$(ls .tigger/branch/"$present_branch"/repository | sort | tail -n -1)
+
+    # checking if the content in files are different from index directory and current directory or index directory and repository
+    for file3 in "$@"
+    do
+        # check if file exists or not
+        if test -e "$file3"
+        then
+            lbranch1=".tigger/branch/$present_branch/index/$file3"
+            #check the difference
+            index_diff=$(diff "$file3" "$lbranch1" | wc -w)
+            
+            if test "$index_diff" -gt 0
+            then
+                if test "$numb" -eq 0
+                then
+                    if test "$index_diff" -gt 0
+                    then
+                        change_temp3=1
+                    fi
+                    
+                else
+                    lmodified_file=".tigger/branch/$present_branch/repository/$latest_branch/$file3"
+                    if test ! -e "$lmodified_file"
+                    then
+                        change_temp3=1
+                        
+                    else
+                        lbranch2=".tigger/branch/$present_branch/index/$file3"
+                        lmodified_diff=".tigger/branch/$present_branch/repository/$latest_branch/$file3"
+                        repo_diff=$(diff $lbranch2 $lmodified_diff | wc -w)
+                        
+                        # check the difference of repository
+                        if test "$repo_diff" -gt 0
+                        then
+                            change_temp3=1
+                        fi
+                    fi   
+                fi
+            fi
+        fi
+
+        # check the counter variable
+        if test "$change_temp3" -eq 1
+        then
+            echo "tigger-rm: error: '$file3' in index is different to both the working file and the repository"
+            exit 1
+        fi
+    done
+
+
+    # Getting the cached flag and remove the file in the directory
+    # check both cached flag and change counter 
+    if test $temp2_cached_cached -eq 1
+    then
+        if test $change_temp3 -eq 0
+        then
+
+            # remove the file from index directory
+            for file4 in "$@"
+            do
+                present_index=".tigger/branch/$present_branch/index/$file4"
+                rm -r "$present_index"
+            done
+        fi
+    fi
+
+
+    # no changes of flags, check whether the index files are committed
+    # if the file already be removed from the current directory, remove the file in the index folder.
+    if test "$temp2_cached_cached" -eq 0
+    then
+        if test "$temp1_force" -eq 0
+        then
+            for file5 in "$@"
+            do  
+                if test -e "$file5"
+                then
+                    # compart the current file with the index dir
+                    lbranch3=".tigger/branch/$present_branch/index/$file5"
+                    index_diff3=$(diff $file5  $lbranch3 | wc -w)
+
+                    if test "$index_diff3" -ne 0
+                    then
+                        if test "$numb" -gt 0
+                        then
+                            lbranch7=".tigger/branch/$present_branch/repository/$latest_branch/$file5 "
+                    
+                            if test -e $lbranch7
+                            then
+                                lbranch8=".tigger/branch/$present_branch/index/$file5"
+                                modified_diff8=".tigger/branch/$present_branch/repository/$latest_branch/$file5"
+                                repo_diff8=$(diff $lbranch8 $modified_diff8 | wc -w)
+                            
+                                if test $repo_diff8 -eq 0
+                                then 
+                                    echo "tigger-rm: error: '$file5' in the repository is different to the working file"
+                                    exit 1
+                                fi
+                            fi
+                        fi
+  
+                    else
+                        if test "$numb" -ne 0
+                        then
+                            
+                            lmodified_file=".tigger/branch/$present_branch/repository/$latest_branch/$file5"
+                            
+                            if test ! -e "$lmodified_file"
+                            then
+                                echo "tigger-rm: error: '$file5' has staged changes in the index"
+                                exit 1
+                                
+                            else
+                                lbranch4=".tigger/branch/$present_branch/index/$file5"
+                                modified_diff=".tigger/branch/$present_branch/repository/$latest_branch/$file5"
+                        
+                                repo_diff3=$(diff $lbranch4 $modified_diff | wc -w)
+                            
+                                if test "$repo_diff3" -gt 0
+                                then
+                                    echo "tigger-rm: error: '$file5' has staged changes in the index"
+                                    exit 1
+                                fi
+                            fi
+                        else
+                            echo "tigger-rm: error: '$file5' has staged changes in the index"
+                            exit 1
+                        fi     
+                    fi
+                fi
+            done
+
+            #remove
+            for file8 in "$@"
+            do	
+                lbranch9=".tigger/branch/$present_branch/index/$file8"
+                rm -r "$lbranch9"
+
+                if test -e "$file8"
+                then
+                    rm -r "$file8"
+                fi
+            done
+        fi
+    fi
+	
+
+else
+
+    echo "tigger-rm: error: no .tigger directory containing tigger repository exists"
+    exit 1
+fi
+
+

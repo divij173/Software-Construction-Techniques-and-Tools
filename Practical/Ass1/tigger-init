@@ -1,0 +1,37 @@
+#!/bin/dash
+
+# Structure of tigger
+# .tigger
+#  |--> All repository
+#  |--> branch
+#       |--> master branch
+#            |--> index
+#            |--> repository
+#       |--> new branch
+#  |--> head
+#  |--> commit
+
+
+# Check if directory exist or not
+# if not exist raise error
+if test -d ".tigger"
+then
+    # raise error
+    echo "tigger-init: error: .tigger already exists"
+    exit 1
+else
+    # If directory does not exist, create the directory tigger
+    mkdir ".tigger"
+    echo "master" >.tigger/current_branch
+    echo "Initialized empty tigger repository in .tigger"
+    mkdir .tigger/repository
+    # Commit the staged files
+    mkdir .tigger/commit
+    # Location of the file on the branch
+    mkdir .tigger/head
+    mkdir .tigger/branch
+    mkdir .tigger/branch/master
+    mkdir .tigger/branch/master/index
+    # Repository in the master branch
+    mkdir .tigger/branch/master/repository
+fi

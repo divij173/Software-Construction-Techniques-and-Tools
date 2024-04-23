@@ -1,0 +1,168 @@
+#!/bin/dash
+
+# Check if directory exist or not
+# if not exist raise error
+if test -d .tigger/
+then
+    present_branch=$(cat .tigger/current_branch)
+
+    if test ! -d ".tigger/branch/$present_branch/index"
+    then
+        # raise error
+        echo "nothing added to commit but untracked files present"
+        exit 1
+    fi
+
+    # Check if there's -a option
+    if test "$1" = "-a"
+    then
+        for file in $(ls .tigger/branch/"$present_branch"/index/*)
+        do  
+            name=$(echo "$file" | cut -d'/' -f5)
+            name_dir=$(ls "$name" 2>/dev/null)
+            if test "$name_dir" = "" 
+            then
+                rm -r $file
+            else
+                cp -r $name $file
+            fi
+        done
+    fi
+
+    # Using temp for checking any changes made 
+    temp=0
+    # Changing file numbers
+    numb=$(ls -c .tigger/repository | wc -l | sed -E 's/ //g')
+
+    # If eq 0 then there is no change
+    if test "$numb" -eq 0
+    then
+        temp=1
+    else
+        # Check the last modified file.
+        branch1_count=$(ls .tigger/branch/"$present_branch"/repository | sort | tail -n -1)
+        # Get the index changes
+        index1=$(ls .tigger/branch/"$present_branch"/index/ | wc -l)
+        # To compare with index changes
+        branch2_count=$(ls .tigger/branch/"$present_branch"/repository/"$branch1_count" | wc -l)
+
+        if test "$index1" -eq "$branch2_count"
+        then
+            #if no change in index
+            if test "$index1" -eq 0
+            then
+                # if no change in rpository
+                if test "$branch2_count" -eq 0
+                then
+                    #print the error
+                    echo "nothing to commit"
+                    exit 1
+                fi
+            fi
+
+            # Check in the directory if file exist or not
+            for file1 in $(ls .tigger/branch/"$present_branch"/index/*)
+            do
+                # Cut the name of the file
+                name2=$(echo "$file1" | cut -d'/' -f5)
+                # get the file in the directory
+                branch3_count=$(ls .tigger/branch/"$present_branch"/repository/"$branch1_count"/"$name2" 2>/dev/null)
+
+                if test "$branch3_count" != ""
+                then
+                    #file exists, check the difference
+                    diff_branch=$(diff "$file1" .tigger/branch/"$present_branch"/repository/"$branch1_count"/"$name2" | wc -w)
+                    if test "$diff_branch" -gt 0
+                    then
+                        temp=1
+                        break
+                    fi
+                else
+                    temp=1
+                    break
+                fi
+            done
+        else
+            temp=1
+        fi
+    fi
+
+    # check if temp has changed or not
+    if test "$temp" -eq 0
+    then
+        #no change
+        echo "nothing to commit"
+        exit 1
+    fi
+
+    # Create directory for files changed based on the temp
+    mkdir ".tigger/repository/$numb"
+    # Create the same in the repository
+    mkdir ".tigger/branch/$present_branch/repository/$numb"
+
+    # Get the file
+    numb2=$(ls .tigger/branch/"$present_branch"/index | wc -l | sed -E 's/ //g')
+
+    #Copying and removing
+    src1=".tigger/branch/$present_branch/index/*"
+    dest1=".tigger/repository/$numb/"
+    present_dest1=".tigger/branch/$present_branch/repository/$numb/"
+    
+    if test "$numb2" -gt 0
+    then
+        cp -r $src1  $dest1 
+        cp -r $src1  $present_dest1
+    fi
+
+    echo "Committed as commit $numb"
+
+    # if there is -a in the command then message is in the 4th location else in the 3rd loaction
+    if test "$#" -eq 4
+    then
+        message_content=$3
+    else
+        message_content=$2
+    fi
+
+    # Check if current log exist or not
+    if test ! -e ".tigger/branch/$present_branch/log"
+    then
+        # create the file 
+        touch .tigger/branch/"$present_branch"/log
+    fi
+
+    echo "$numb $message_content" >> .tigger/branch/"$present_branch"/log
+
+else
+    # Adding the message in the log file created after the first commit
+    echo "tigger-commit: error: no .tigger directory containing tigger repository exists"
+    exit 1
+fi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
